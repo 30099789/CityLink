@@ -1,0 +1,35 @@
+Run CityLink Frontend on Another PC (Vite + React)
+1) Install required software
+
+On the new PC install:
+
+Node.js (LTS)
+
+Git (optional, only if you clone from GitHub)
+
+To check Node is installed:
+
+node -v
+npm -v
+
+
+2) Install dependencies
+
+In the client folder run:
+
+
+npm install
+
+
+This recreates node_modules from package.json.
+
+3) Start the dev server
+
+npm run dev
+
+
+4) Start the dev server
+
+npm run dev
+
+Local: http://localhost:5173
