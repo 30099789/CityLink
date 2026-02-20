@@ -1,35 +1,47 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+
+import MainLayout from "./layout/MainLayout";
+import AdminLayout from "./layout/AdminLayout";
+
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import Announcements from "./pages/Announcements";
+import Events from "./pages/Events";
+import Faq from "./pages/Faq";
+
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import ManageEvents from "./pages/admin/ManageEvents";
+import ManageUsers from "./pages/admin/ManageUsers";
+import ManageFeedback from "./pages/admin/ManageFeedback";
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <BrowserRouter>
+      <Routes>
+
+        {/* PUBLIC PAGES */}
+        <Route element={<MainLayout />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/announcements" element={<Announcements />} />
+          <Route path="/events" element={<Events />} />
+          <Route path="/faq" element={<Faq />} />
+        </Route>
+
+        {/* ADMIN SECTION */}
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<AdminDashboard />} />
+          <Route path="events" element={<ManageEvents />} />
+          <Route path="users" element={<ManageUsers />} />
+          <Route path="feedback" element={<ManageFeedback />} />
+        </Route>
+
+        {/* FALLBACK */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;
