@@ -8,6 +8,8 @@ import Login from "./pages/Login";
 import Announcements from "./pages/Announcements";
 import Events from "./pages/Events";
 import Faq from "./pages/Faq";
+import Services from "./pages/Services";
+import Feedback from "./pages/Feedback";
 
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import ManageEvents from "./pages/admin/ManageEvents";
@@ -26,6 +28,8 @@ function App() {
           <Route path="/announcements" element={<Announcements />} />
           <Route path="/events" element={<Events />} />
           <Route path="/faq" element={<Faq />} />
+          <Route path="services" element={<Services />} />
+          <Route path="feedback" element={<Feedback />} />
         </Route>
 
         {/* ADMIN SECTION */}
