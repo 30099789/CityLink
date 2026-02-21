@@ -2,44 +2,46 @@ import { Link } from "react-router-dom";
 
 export default function Home() {
   return (
-    <div className="home-page" style={{ padding: "24px" }}>
-      {/* Hero section */}
-      <section style={{ marginBottom: "24px" }}>
-        <h1>Welcome to CityLink Initiatives</h1>
+    <main>
+      <section style={{ marginBottom: "30px" }}>
+        <h1>Smart Community Portal</h1>
         <p>
-          Smart Community Portal helping residents access services,
-          announcements and community events.
+          Welcome to CityLink Initiatives. Access events, announcements,
+          services and community feedback in one place.
         </p>
       </section>
 
-      {/* Quick links */}
       <section
         style={{
           display: "grid",
-          gap: "12px",
-          maxWidth: "500px"
+          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+          gap: "15px",
         }}
       >
-        <Link to="/announcements">
-          <button>View Announcements</button>
-        </Link>
-
-        <Link to="/events">
-          <button>Community Events</button>
-        </Link>
-
-        <Link to="/services">
-          <button>Services</button>
-        </Link>
-
-        <Link to="/feedback">
-          <button>Leave Feedback</button>
-        </Link>
-
-        <Link to="/admin">
-          <button>Admin Dashboard</button>
-        </Link>
+        <Card title="Events" link="/events" />
+        <Card title="Announcements" link="/announcements" />
+        <Card title="Services" link="/services" />
+        <Card title="Feedback" link="/feedback" />
       </section>
-    </div>
+    </main>
+  );
+}
+
+function Card({ title, link }: { title: string; link: string }) {
+  return (
+    <Link
+      to={link}
+      style={{
+        background: "white",
+        padding: "20px",
+        borderRadius: "10px",
+        textDecoration: "none",
+        color: "#222",
+        boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
+      }}
+    >
+      <h3>{title}</h3>
+      <p>Open {title}</p>
+    </Link>
   );
 }
