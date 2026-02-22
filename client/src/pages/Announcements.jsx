@@ -1,12 +1,7 @@
 import { useEffect, useState } from "react";
 
-type Announcement = {
-  title: string;
-  date: string;
-};
-
 export default function Announcements() {
-  const [items, setItems] = useState<Announcement[]>([]);
+  const [items, setItems] = useState([]);
 
   useEffect(() => {
     fetch("/src/data/announcements.xml")

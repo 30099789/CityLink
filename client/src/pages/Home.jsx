@@ -27,8 +27,7 @@ export default function Home() {
   );
 }
 
-function Card({ title, link }: { title: string; link: string }) {
-  return (
+function Card({ title, link }) {  return (
     <Link
       to={link}
       style={{

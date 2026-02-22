@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import MainLayout from "./layout/MainLayout";
 import AdminLayout from "./layout/AdminLayout";
@@ -16,23 +16,23 @@ import ManageEvents from "./pages/admin/ManageEvents";
 import ManageUsers from "./pages/admin/ManageUsers";
 import ManageFeedback from "./pages/admin/ManageFeedback";
 
-function App() {
+export default function App() {
   return (
     <BrowserRouter>
       <Routes>
 
-        {/* PUBLIC PAGES */}
-        <Route element={<MainLayout />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/announcements" element={<Announcements />} />
-          <Route path="/events" element={<Events />} />
-          <Route path="/faq" element={<Faq />} />
+        {/* MAIN WEBSITE */}
+        <Route path="/" element={<MainLayout />}>
+          <Route index element={<Home />} />
+          <Route path="login" element={<Login />} />
+          <Route path="announcements" element={<Announcements />} />
+          <Route path="events" element={<Events />} />
+          <Route path="faq" element={<Faq />} />
           <Route path="services" element={<Services />} />
           <Route path="feedback" element={<Feedback />} />
         </Route>
 
-        {/* ADMIN SECTION */}
+        {/* ADMIN AREA */}
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
           <Route path="events" element={<ManageEvents />} />
@@ -40,12 +40,7 @@ function App() {
           <Route path="feedback" element={<ManageFeedback />} />
         </Route>
 
-        {/* FALLBACK */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-
       </Routes>
     </BrowserRouter>
   );
 }
-
-export default App;
