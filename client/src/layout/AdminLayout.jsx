@@ -1,31 +1,53 @@
-import { Link, Outlet } from "react-router-dom";
+import { NavLink, Outlet } from "react-router-dom";
+
+const linkClass = ({ isActive }) =>
+  `block rounded-md px-3 py-2 text-sm ${
+    isActive
+      ? "bg-slate-900 text-white"
+      : "text-slate-700 hover:bg-slate-100 hover:text-slate-900"
+  }`;
 
 export default function AdminLayout() {
   return (
-    <div style={{ display: "flex", minHeight: "100vh" }}>
-      {/* Sidebar */}
-      <aside
-        style={{
-          width: "220px",
-          background: "#1e293b",
-          color: "white",
-          padding: "16px",
-        }}
-      >
-        <h3>Admin Panel</h3>
+    <div className="min-h-screen bg-slate-50 text-slate-900">
+      <header className="border-b bg-white">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+          <div className="font-semibold">CityLink Admin</div>
+          <div className="text-sm text-slate-600">Prototype mode</div>
+        </div>
+      </header>
 
-        <nav style={{ display: "grid", gap: "10px", marginTop: "20px" }}>
-          <Link to="/admin" style={{ color: "white" }}>Dashboard</Link>
-          <Link to="/admin/events" style={{ color: "white" }}>Events</Link>
-          <Link to="/admin/users" style={{ color: "white" }}>Users</Link>
-          <Link to="/admin/feedback" style={{ color: "white" }}>Feedback</Link>
-        </nav>
-      </aside>
+      <div className="mx-auto grid max-w-6xl grid-cols-1 gap-4 px-4 py-6 md:grid-cols-[240px_1fr]">
+        <aside className="rounded-xl border bg-white p-3">
+          <div className="px-3 pb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+            Admin Menu
+          </div>
+          <nav className="space-y-1">
+            <NavLink to="/admin" end className={linkClass}>
+              Dashboard
+            </NavLink>
+            <NavLink to="/admin/events" className={linkClass}>
+              Manage Events
+            </NavLink>
+            <NavLink to="/admin/users" className={linkClass}>
+              Manage Users
+            </NavLink>
+            <NavLink to="/admin/feedback" className={linkClass}>
+              Manage Feedback
+            </NavLink>
+          </nav>
 
-      {/* Content */}
-      <main style={{ flex: 1, padding: "24px" }}>
-        <Outlet />
-      </main>
+          <div className="mt-4 border-t pt-3">
+            <NavLink to="/" className={() => "block rounded-md px-3 py-2 text-sm text-slate-700 hover:bg-slate-100"}>
+              Back to website
+            </NavLink>
+          </div>
+        </aside>
+
+        <main className="rounded-xl border bg-white p-4">
+          <Outlet />
+        </main>
+      </div>
     </div>
   );
 }

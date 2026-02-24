@@ -1,4 +1,9 @@
 Run CityLink Frontend on Another PC (Vite + React)
+
+
+cd CityLink/client
+
+
 1) Install required software
 
 On the new PC install:
@@ -33,3 +38,27 @@ npm run dev
 npm run dev
 
 Local: http://localhost:5173
+
+
+Install Tailwind packages
+
+5) npm install -D tailwindcss @tailwindcss/cli @tailwindcss/postcss
+
+
+6) Check project files
+
+postcss.config.js
+
+export default {
+  plugins: {
+    "@tailwindcss/postcss": {},
+  },
+};
+
+ 7) or 
+ 
+cd CityLink/client
+npm install
+npm install -D tailwindcss @tailwindcss/postcss @tailwindcss/cli
+npm run dev
+
