@@ -24,13 +24,15 @@ export default function App() {
         {/* MAIN WEBSITE */}
         <Route path="/" element={<MainLayout />}>
           <Route index element={<Home />} />
-          <Route path="login" element={<Login />} />
           <Route path="announcements" element={<Announcements />} />
           <Route path="events" element={<Events />} />
           <Route path="faq" element={<Faq />} />
           <Route path="services" element={<Services />} />
           <Route path="feedback" element={<Feedback />} />
         </Route>
+
+        {/* LOGIN PAGE (NO LAYOUT) */}
+        <Route path="/login" element={<Login />} />
 
         {/* ADMIN AREA */}
         <Route path="/admin" element={<AdminLayout />}>
