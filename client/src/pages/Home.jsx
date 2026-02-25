@@ -2,45 +2,45 @@ import { Link } from "react-router-dom";
 
 export default function Home() {
   return (
-    <main>
-      <section style={{ marginBottom: "30px" }}>
-        <h1>Smart Community Portal</h1>
-        <p>
+    <main className="max-w-6xl mx-auto px-4 py-10">
+      
+      {/* Hero Section */}
+      <section className="mb-10">
+        <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-3">
+          Smart Community Portal
+        </h1>
+
+        <p className="text-gray-600 text-lg max-w-2xl">
           Welcome to CityLink Initiatives. Access events, announcements,
           services and community feedback in one place.
         </p>
       </section>
 
-      <section
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-          gap: "15px",
-        }}
-      >
+      {/* Cards Section */}
+      <section className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
         <Card title="Events" link="/events" />
         <Card title="Announcements" link="/announcements" />
         <Card title="Services" link="/services" />
         <Card title="Feedback" link="/feedback" />
       </section>
+
     </main>
   );
 }
 
-function Card({ title, link }) {  return (
+function Card({ title, link }) {
+  return (
     <Link
       to={link}
-      style={{
-        background: "white",
-        padding: "20px",
-        borderRadius: "10px",
-        textDecoration: "none",
-        color: "#222",
-        boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
-      }}
+      className="bg-white p-5 rounded-xl shadow hover:shadow-lg transition duration-300 border border-gray-100"
     >
-      <h3>{title}</h3>
-      <p>Open {title}</p>
+      <h3 className="text-xl font-semibold text-gray-800 mb-2">
+        {title}
+      </h3>
+
+      <p className="text-gray-500">
+        Open {title}
+      </p>
     </Link>
   );
 }

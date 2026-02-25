@@ -62,3 +62,8 @@ npm install
 npm install -D tailwindcss @tailwindcss/postcss @tailwindcss/cli
 npm run dev
 
+
+8) Install Xml reader : 
+
+npm install fast-xml-parser
+
