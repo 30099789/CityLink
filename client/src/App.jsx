@@ -5,6 +5,7 @@ import AdminLayout from "./layout/AdminLayout";
 
 import Home from "./pages/Home";
 import Login from "./pages/Login";
+import Signup from "./pages/Signup";
 import Announcements from "./pages/Announcements";
 import Events from "./pages/Events";
 import Faq from "./pages/Faq";
@@ -20,7 +21,6 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-
         {/* MAIN WEBSITE */}
         <Route path="/" element={<MainLayout />}>
           <Route index element={<Home />} />
@@ -31,8 +31,9 @@ export default function App() {
           <Route path="feedback" element={<Feedback />} />
         </Route>
 
-        {/* LOGIN PAGE (NO LAYOUT) */}
+        {/* AUTH PAGES (NO LAYOUT) */}
         <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
 
         {/* ADMIN AREA */}
         <Route path="/admin" element={<AdminLayout />}>
@@ -41,7 +42,6 @@ export default function App() {
           <Route path="users" element={<ManageUsers />} />
           <Route path="feedback" element={<ManageFeedback />} />
         </Route>
-
       </Routes>
     </BrowserRouter>
   );
