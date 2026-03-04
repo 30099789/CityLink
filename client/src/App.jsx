@@ -1,7 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import MainLayout from "./layout/MainLayout";
-import AdminLayout from "./layout/AdminLayout";
 
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -21,27 +20,30 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+
         {/* MAIN WEBSITE */}
         <Route path="/" element={<MainLayout />}>
+
           <Route index element={<Home />} />
+
           <Route path="announcements" element={<Announcements />} />
           <Route path="events" element={<Events />} />
           <Route path="faq" element={<Faq />} />
           <Route path="services" element={<Services />} />
           <Route path="feedback" element={<Feedback />} />
+
+          {/* ADMIN PAGES INSIDE MAIN SITE */}
+          <Route path="admin" element={<AdminDashboard />} />
+          <Route path="admin/events" element={<ManageEvents />} />
+          <Route path="admin/users" element={<ManageUsers />} />
+          <Route path="admin/feedback" element={<ManageFeedback />} />
+
         </Route>
 
-        {/* AUTH PAGES (NO LAYOUT) */}
+        {/* AUTH PAGES */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
 
-        {/* ADMIN AREA */}
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<AdminDashboard />} />
-          <Route path="events" element={<ManageEvents />} />
-          <Route path="users" element={<ManageUsers />} />
-          <Route path="feedback" element={<ManageFeedback />} />
-        </Route>
       </Routes>
     </BrowserRouter>
   );

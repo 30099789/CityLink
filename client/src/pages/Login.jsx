@@ -1,10 +1,28 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Login() {
+
+  const navigate = useNavigate();
+
+  function handleLogin(e) {
+    e.preventDefault();
+
+  // For demo purposes
+    const user = {
+      email: "admin@citylink.gov",
+      role: "admin"
+    };
+
+    localStorage.setItem("citylink_user", JSON.stringify(user));
+
+    // redirect to admin dashboard
+    navigate("/admin");
+  }
+
   return (
     <main className="min-h-screen bg-gray-100 flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-md">
-        {/* Back to home */}
+
         <Link
           to="/"
           className="inline-block mb-4 text-sm font-medium text-blue-600 hover:underline"
@@ -12,15 +30,13 @@ export default function Login() {
           ← Back to Home
         </Link>
 
-        {/* Card */}
         <div className="rounded-3xl bg-white shadow-xl border border-gray-100 p-8">
-          {/* Header */}
+
           <h1 className="text-3xl font-bold text-gray-900">Sign in</h1>
           <p className="text-gray-500 mt-2 mb-6">
             Enter your details to access your account.
           </p>
 
-          {/* Tabs (Sign in active, Sign up link) */}
           <div className="mb-6 grid grid-cols-2 rounded-2xl bg-gray-100 p-1">
             <div className="rounded-xl bg-white py-2 text-center text-sm font-semibold text-gray-900 shadow-sm">
               Sign in
@@ -33,8 +49,8 @@ export default function Login() {
             </Link>
           </div>
 
-          {/* Form */}
-          <form className="space-y-4">
+          {/* FORM */}
+          <form className="space-y-4" onSubmit={handleLogin}>
             <Field label="Email" type="email" placeholder="admin@citylink.gov" />
             <Field label="Password" type="password" placeholder="Enter password" />
 
@@ -60,7 +76,6 @@ export default function Login() {
             </button>
           </form>
 
-          {/* Footer text */}
           <p className="mt-6 text-sm text-gray-600">
             New here?{" "}
             <Link to="/signup" className="text-blue-600 font-medium hover:underline">
