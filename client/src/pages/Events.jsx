@@ -1,7 +1,18 @@
 import { Link } from "react-router-dom";
-
+import { useEffect, useState } from "react";
+import { getEvents } from "../services/eventService";
 
 export default function Events() {
+  const [events, setEvents] = useState([]);
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      const eventsData = await getEvents();
+      setEvents(eventsData);
+    };
+    fetchEvents();
+  }, []);
+
   return (
     <main className="max-w-6xl mx-auto px-4 py-10">
       <section className="mb-10">
