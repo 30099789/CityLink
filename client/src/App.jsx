@@ -1,50 +1,71 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider, RequireAdmin } from "./context/AuthContext";
+import { useEffect } from "react";
+import { initMockData } from "./data/mockData";
 
 import MainLayout from "./layout/MainLayout";
 
-import Home from "./pages/Home";
-import Login from "./pages/Login";
-import Signup from "./pages/Signup";
+// ── Caio PAGES ────────────────────────────────────────────────────────
+import Home          from "./pages/Home";
 import Announcements from "./pages/Announcements";
-import Events from "./pages/Events";
-import Faq from "./pages/Faq";
-import Services from "./pages/Services";
-import Feedback from "./pages/Feedback";
+import Events        from "./pages/Events";
+import Faq           from "./pages/Faq";
+import Services      from "./pages/Services";
+import Feedback      from "./pages/Feedback";
 
-import AdminDashboard from "./pages/admin/AdminDashboard";
-import ManageEvents from "./pages/admin/ManageEvents";
-import ManageUsers from "./pages/admin/ManageUsers";
-import ManageFeedback from "./pages/admin/ManageFeedback";
+// ── Kate PAGES ────────────────────────────────────────────────────────────────
+import Login          from "./pages/Login";
+import Signup         from "./pages/Signup";
+import TermsOfService from "./pages/TermsOfService";
+import PrivacyPolicy  from "./pages/PrivacyPolicy";
+import Contact        from "./pages/Contact";
+import Profile        from "./pages/Profile";
+import Accessibility  from "./pages/Accessibility";
+
+import AdminDashboard      from "./pages/admin/AdminDashboard";
+import ManageEvents        from "./pages/admin/ManageEvents";
+import ManageUsers         from "./pages/admin/ManageUsers";
+import ManageFeedback      from "./pages/admin/ManageFeedback";
+import ManageAnnouncements from "./pages/admin/ManageAnnouncements";
+import ManageBookings      from "./pages/admin/ManageBookings";
 
 export default function App() {
+  useEffect(() => { initMockData(); }, []);
+
   return (
-    <BrowserRouter>
-      <Routes>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
 
-        {/* MAIN WEBSITE */}
-        <Route path="/" element={<MainLayout />}>
+          {/* MAIN WEBSITE — group member pages */}
+          <Route path="/" element={<MainLayout />}>
+            <Route index                element={<Home />} />
+            <Route path="announcements" element={<Announcements />} />
+            <Route path="events"        element={<Events />} />
+            <Route path="faq"           element={<Faq />} />
+            <Route path="services"      element={<Services />} />
+            <Route path="feedback"      element={<Feedback />} />
+            <Route path="contact"       element={<Contact />} />
+            <Route path="terms"         element={<TermsOfService />} />
+            <Route path="privacy"       element={<PrivacyPolicy />} />
+            <Route path="profile"       element={<Profile />} />
+            <Route path="accessibility" element={<Accessibility />} />
+          </Route>
 
-          <Route index element={<Home />} />
+          {/* AUTH —  pages */}
+          <Route path="/login"  element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
 
-          <Route path="announcements" element={<Announcements />} />
-          <Route path="events" element={<Events />} />
-          <Route path="faq" element={<Faq />} />
-          <Route path="services" element={<Services />} />
-          <Route path="feedback" element={<Feedback />} />
+          {/* ADMIN — pages (protected) */}
+          <Route path="/admin"               element={<RequireAdmin><AdminDashboard /></RequireAdmin>} />
+          <Route path="/admin/events"        element={<RequireAdmin><ManageEvents /></RequireAdmin>} />
+          <Route path="/admin/users"         element={<RequireAdmin><ManageUsers /></RequireAdmin>} />
+          <Route path="/admin/feedback"      element={<RequireAdmin><ManageFeedback /></RequireAdmin>} />
+          <Route path="/admin/announcements" element={<RequireAdmin><ManageAnnouncements /></RequireAdmin>} />
+          <Route path="/admin/bookings"      element={<RequireAdmin><ManageBookings /></RequireAdmin>} />
 
-          {/* ADMIN PAGES INSIDE MAIN SITE */}
-          <Route path="admin" element={<AdminDashboard />} />
-          <Route path="admin/events" element={<ManageEvents />} />
-          <Route path="admin/users" element={<ManageUsers />} />
-          <Route path="admin/feedback" element={<ManageFeedback />} />
-
-        </Route>
-
-        {/* AUTH PAGES */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-
-      </Routes>
-    </BrowserRouter>
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }

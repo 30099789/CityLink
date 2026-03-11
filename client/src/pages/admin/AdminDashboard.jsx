@@ -1,260 +1,326 @@
+import { useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import {
+  getEvents, getBookings, getFeedback, getAnnouncements, getUsers,
+  saveEvents, saveAnnouncements, saveFeedback, saveBookings,
+} from "../../data/mockData";
 
-function safeReadArray(key) {
-  try {
-    const raw = localStorage.getItem(key);
-    const parsed = raw ? JSON.parse(raw) : null;
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-}
+/* ── ICONS ─────────────────────────────────────────────────────────────────── */
+const I = ({ d, cls = "w-5 h-5" }) => (
+  <svg className={cls} fill="none" stroke="currentColor" strokeWidth={1.75} viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" d={d} />
+  </svg>
+);
+const ICONS = {
+  calendar:  "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z",
+  users:     "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z",
+  chat:      "M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z",
+  bell:      "M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9",
+  bookmark:  "M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z",
+  arrow:     "M9 5l7 7-7 7",
+  download:  "M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4",
+  upload:    "M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12",
+  plus:      "M12 4v16m8-8H4",
+  logout:    "M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1",
+  user:      "M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z",
+};
 
-function Card({ children, className = "" }) {
+/* ── KPI CARD ───────────────────────────────────────────────────────────────── */
+function KpiCard({ iconKey, label, value, sub }) {
   return (
-    <div className={`rounded-2xl border border-slate-200 bg-white shadow-sm ${className}`}>
-      {children}
+    <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+      <div className="text-3xl font-bold text-slate-900 mb-1">{value}</div>
+      <div className="text-sm font-semibold text-slate-700">{label}</div>
+      {sub && <div className="text-xs text-slate-400 mt-0.5">{sub}</div>}
     </div>
   );
 }
 
-function KpiCard({ icon, value, label, iconClass }) {
-  const Icon = icon;
+/* ── MANAGEMENT ROW ─────────────────────────────────────────────────────────── */
+function MgmtRow({ to, iconKey, label, count, unit }) {
   return (
-    <Card className="p-6">
-      <div className="flex items-start justify-between">
-        <div className={`h-10 w-10 ${iconClass}`}>
-          <Icon className="h-10 w-10" />
+    <Link to={to}
+      className="flex items-center justify-between px-4 py-3.5 bg-white border border-slate-200 rounded-xl hover:border-blue-300 hover:shadow-sm transition group">
+      <div className="flex items-center gap-3">
+        <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
+          <I d={ICONS[iconKey]} cls="w-4 h-4 text-blue-700" />
         </div>
-        <IconArrowUpRight className="h-5 w-5 text-slate-400" />
+        <span className="text-sm font-semibold text-slate-800">{label}</span>
       </div>
-      <div className="mt-5">
-        <div className="text-3xl font-semibold text-slate-900">{value}</div>
-        <div className="mt-1 text-sm text-slate-500">{label}</div>
-      </div>
-    </Card>
-  );
-}
-
-function QuickActionCard({ to, icon, label }) {
-  const Icon = icon;
-  return (
-    <Link to={to} className="block">
-      <Card className="p-6 hover:shadow-md hover:-translate-y-0.5 transition">
-        <div className="flex flex-col items-center justify-center gap-3 text-center">
-          <div className="h-12 w-12 text-blue-700">
-            <Icon className="h-12 w-12" />
-          </div>
-          <div className="text-sm font-medium text-slate-800">{label}</div>
-        </div>
-      </Card>
-    </Link>
-  );
-}
-
-function ManagementRow({ to, icon, label, rightText }) {
-  const Icon = icon;
-  return (
-    <Link to={to} className="block">
-      <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm hover:shadow-md transition">
-        <div className="flex items-center gap-3">
-          <div className="h-6 w-6 text-blue-700">
-            <Icon className="h-6 w-6" />
-          </div>
-          <div className="text-sm font-medium text-slate-800">{label}</div>
-        </div>
-        {rightText ? <div className="text-sm text-slate-500">{rightText}</div> : null}
+      <div className="flex items-center gap-2">
+        <span className="text-xs text-slate-400 font-medium">{count} {unit}</span>
+        <I d={ICONS.arrow} cls="w-4 h-4 text-slate-300 group-hover:text-blue-500 transition" />
       </div>
     </Link>
   );
 }
 
-/* Inline icons */
-function IconCalendar(props) {
+/* ── QUICK ACTION CARD ──────────────────────────────────────────────────────── */
+function QuickCard({ iconKey, label, onClick, disabled }) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" {...props}>
-      <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M8 2v3M16 2v3" />
-      <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M3 9h18" />
-      <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M5 5h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z" />
-    </svg>
-  );
-}
-function IconUsers(props) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" {...props}>
-      <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-      <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M8 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" />
-      <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M22 21v-2a4 4 0 0 0-3-3.87" />
-      <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M16 3.13a4 4 0 0 1 0 7.75" />
-    </svg>
-  );
-}
-function IconChat(props) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" {...props}>
-      <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v8Z" />
-    </svg>
-  );
-}
-function IconBell(props) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" {...props}>
-      <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M6 8a6 6 0 0 1 12 0c0 7 3 7 3 7H3s3 0 3-7Z" />
-      <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M10 19a2 2 0 0 0 4 0" />
-    </svg>
-  );
-}
-function IconArrowUpRight(props) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" {...props}>
-      <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M7 17 17 7" />
-      <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M10 7h7v7" />
-    </svg>
-  );
-}
-function IconDownload(props) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" {...props}>
-      <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M12 3v10" />
-      <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M8 11l4 4 4-4" />
-      <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M4 21h16" />
-    </svg>
-  );
-}
-function IconUpload(props) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" {...props}>
-      <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M12 21V11" />
-      <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M8 14l4-4 4 4" />
-      <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M4 3h16" />
-    </svg>
+    <button onClick={onClick} disabled={disabled}
+      className="flex flex-col items-center justify-center gap-3 bg-white border border-slate-200 rounded-2xl p-6 hover:border-blue-300 hover:shadow-md transition w-full disabled:opacity-50 disabled:cursor-not-allowed">
+      <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center">
+        <I d={ICONS[iconKey]} cls="w-6 h-6 text-blue-700" />
+      </div>
+      <span className="text-sm font-semibold text-slate-700">{label}</span>
+    </button>
   );
 }
 
-function getUser() {
-  try {
-    const u = JSON.parse(localStorage.getItem("citylink_user"));
-    return u && typeof u === "object" ? u : null;
-  } catch {
-    return null;
+/* ── XML HELPERS ────────────────────────────────────────────────────────────── */
+function exportXML() {
+  const data = {
+    events:        getEvents(),
+    announcements: getAnnouncements(),
+    feedback:      getFeedback(),
+    bookings:      getBookings(),
+  };
+
+  function toXml(obj, tag) {
+    if (Array.isArray(obj)) return obj.map((item) => toXml(item, tag.replace(/s$/, ""))).join("\n");
+    if (typeof obj === "object" && obj !== null) {
+      const inner = Object.entries(obj).map(([k, v]) => toXml(v, k)).join("");
+      return `<${tag}>${inner}</${tag}>`;
+    }
+    return `<${tag}>${String(obj ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}</${tag}>`;
   }
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<citylink>\n`
+    + `  <events>\n${toXml(data.events,"events")}\n  </events>\n`
+    + `  <announcements>\n${toXml(data.announcements,"announcements")}\n  </announcements>\n`
+    + `  <feedback>\n${toXml(data.feedback,"feedback")}\n  </feedback>\n`
+    + `  <bookings>\n${toXml(data.bookings,"bookings")}\n  </bookings>\n`
+    + `</citylink>`;
+
+  const blob = new Blob([xml], { type: "application/xml" });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement("a");
+  a.href     = url;
+  a.download = `citylink-export-${new Date().toISOString().slice(0,10)}.xml`;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
+function importXML(file, onDone, onError) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const parser = new DOMParser();
+      const doc    = parser.parseFromString(e.target.result, "application/xml");
+
+      function parseItems(tag) {
+        return Array.from(doc.getElementsByTagName(tag)).map((el) => {
+          const obj = {};
+          Array.from(el.children).forEach((child) => { obj[child.tagName] = child.textContent; });
+          return obj;
+        });
+      }
+
+      const events        = parseItems("event");
+      const announcements = parseItems("announcement");
+      const feedback      = parseItems("feedbackItem");
+      const bookings      = parseItems("booking");
+
+      if (events.length)        saveEvents(events);
+      if (announcements.length) saveAnnouncements(announcements);
+      if (feedback.length)      saveFeedback(feedback);
+      if (bookings.length)      saveBookings(bookings);
+
+      onDone({ events: events.length, announcements: announcements.length, feedback: feedback.length, bookings: bookings.length });
+    } catch (err) {
+      onError("Invalid XML file. Please use a CityLink export file.");
+    }
+  };
+  reader.readAsText(file);
+}
+
+/* ── MAIN COMPONENT ─────────────────────────────────────────────────────────── */
 export default function AdminDashboard() {
-  const navigate = useNavigate();
-  const user = getUser();
+  const { user, logout } = useAuth();
+  const navigate         = useNavigate();
+  const fileRef          = useRef();
 
-  const events = safeReadArray("citylink_events");
-  const users = safeReadArray("citylink_users");
-  const feedback = safeReadArray("citylink_feedback");
-  const announcements = safeReadArray("citylink_announcements");
-  const bookings = safeReadArray("citylink_bookings");
+  const [toast, setToast] = useState(null);
 
-  const activeBookings = bookings.filter((b) => b && b.status === "Confirmed").length;
-  const pendingFeedback = feedback.filter((f) => f && f.status === "New").length;
-  const publishedAnnouncements = announcements.filter((a) => a && a.status === "Published").length;
+  const events        = getEvents();
+  const bookings      = getBookings();
+  const feedback      = getFeedback();
+  const announcements = getAnnouncements();
+  const users         = getUsers();
+
+  const activeBookings  = bookings.filter((b) => b.status === "Confirmed").length;
+  const pendingFeedback = feedback.filter((f) => f.status === "New").length;
+
+  function showToast(msg, type = "success") {
+    setToast({ msg, type });
+    setTimeout(() => setToast(null), 3500);
+  }
+
+  function handleExport() {
+    exportXML();
+    showToast("Data exported successfully as XML.");
+  }
+
+  function handleImportClick() { fileRef.current?.click(); }
+
+  function handleFileChange(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    importXML(
+      file,
+      (counts) => showToast(`Imported: ${counts.events} events, ${counts.announcements} announcements, ${counts.feedback} feedback, ${counts.bookings} bookings.`),
+      (err)    => showToast(err, "error"),
+    );
+    e.target.value = "";
+  }
+
+  function handleLogout() { logout(); navigate("/login", { replace: true }); }
 
   const recentActivity = [
-    { message: "New booking for Community Clean-Up Day", time: "5 minutes ago" },
-    { message: "New feedback submission received", time: "1 hour ago" },
-    { message: "Event capacity updated for Town Hall Meeting", time: "2 hours ago" },
+    { msg: "New booking: Community Clean-Up Day",       time: "5 min ago",  dot: "bg-blue-500"   },
+    { msg: "Feedback received from alice@email.com",    time: "1 hr ago",   dot: "bg-orange-400" },
+    { msg: "Announcement published: Bin Night Changes", time: "2 hrs ago",  dot: "bg-emerald-500"},
+    { msg: "Event updated: Town Hall Meeting",          time: "3 hrs ago",  dot: "bg-slate-400"  },
   ];
-
-  function handleLogout() {
-    localStorage.removeItem("citylink_user");
-    navigate("/", { replace: true });
-  }
 
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* Admin Top Bar */}
-      <div className="border-b bg-white">
-        <div className="mx-auto max-w-6xl px-4 py-4 flex items-center justify-between">
-          <div>
-            <div className="text-sm text-slate-500">CityLink Initiatives</div>
-            <div className="text-xl font-semibold text-slate-900">Admin Portal</div>
+
+      {/* ── NAVBAR ── */}
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-20">
+        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+          {/* Logo */}
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-blue-700 flex items-center justify-center flex-shrink-0">
+              <span className="text-white text-xs font-bold">CL</span>
+            </div>
+            <div className="leading-tight">
+              <p className="text-sm font-bold text-blue-800">CityLink Initiatives</p>
+              <p className="text-xs text-slate-400">Smart Community Portal</p>
+            </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="hidden sm:block text-right">
-              <div className="text-sm font-semibold text-slate-900">
-                {user?.email || "Admin User"}
-              </div>
-              <div className="text-xs text-slate-500">Administrator</div>
-            </div>
+          {/* Nav links */}
+          <nav className="hidden lg:flex items-center gap-1 text-sm">
+            {[
+              { label: "Home",          to: "/"              },
+              { label: "Services",      to: "/services"      },
+              { label: "Events",        to: "/events"        },
+              { label: "FAQ",           to: "/faq"           },
+              { label: "Announcements", to: "/announcements" },
+              { label: "Feedback",      to: "/feedback"      },
+            ].map(({ label, to }) => (
+              <Link key={to} to={to}
+                className="px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 font-medium transition-colors">
+                {label}
+              </Link>
+            ))}
+          </nav>
 
-            <button
-              onClick={handleLogout}
-              className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100"
-            >
-              Logout
+          {/* Right */}
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-blue-700 text-white rounded-lg text-sm font-bold">
+              <I d={ICONS.user} cls="w-4 h-4" />
+              Admin Portal
+            </div>
+            <div className="flex items-center gap-2 px-3 py-1.5 border border-slate-200 rounded-lg text-sm text-slate-700">
+              <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center">
+                <I d={ICONS.user} cls="w-3.5 h-3.5 text-blue-700" />
+              </div>
+              <span className="hidden sm:block font-medium">{user?.name || user?.email}</span>
+            </div>
+            <button onClick={handleLogout}
+              className="flex items-center gap-1.5 px-3 py-1.5 border border-slate-200 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-colors">
+              <I d={ICONS.logout} cls="w-3.5 h-3.5" />
+              <span className="hidden sm:block">Sign Out</span>
             </button>
           </div>
         </div>
-      </div>
+      </header>
 
-      {/* Content */}
-      <div className="mx-auto max-w-6xl px-4 py-10">
-        <div className="mb-10">
-          <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight text-slate-900">
-            Admin Portal
+      {/* ── TOAST ── */}
+      {toast && (
+        <div className={`fixed top-5 right-5 z-50 flex items-start gap-3 px-4 py-3 rounded-xl shadow-lg border text-sm font-medium max-w-sm ${
+          toast.type === "error"
+            ? "bg-red-50 border-red-200 text-red-700"
+            : "bg-emerald-50 border-emerald-200 text-emerald-700"
+        }`}>
+          <I d={toast.type === "error" ? "M6 18L18 6M6 6l12 12" : "M5 13l4 4L19 7"} cls="w-4 h-4 flex-shrink-0 mt-0.5" />
+          {toast.msg}
+        </div>
+      )}
+
+      {/* Hidden file input for XML import */}
+      <input ref={fileRef} type="file" accept=".xml" className="hidden" onChange={handleFileChange} />
+
+      <div className="max-w-6xl mx-auto px-4 py-8">
+
+        {/* Welcome */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-slate-900">
+            Welcome back{user?.name ? `, ${user.name.split(" ")[0]}` : ""}!
           </h1>
-          <p className="mt-3 text-base sm:text-lg text-slate-600">
-            Manage events, bookings, and community engagement
-          </p>
+          <p className="text-slate-500 mt-1 text-sm">Here's what's happening in the community portal today.</p>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
-          <KpiCard icon={IconCalendar} value={events.length} label="Total Events" iconClass="text-blue-800" />
-          <KpiCard icon={IconUsers} value={activeBookings} label="Active Bookings" iconClass="text-emerald-700" />
-          <KpiCard icon={IconChat} value={pendingFeedback} label="Pending Feedback" iconClass="text-orange-500" />
-          <KpiCard icon={IconBell} value={publishedAnnouncements} label="Announcements" iconClass="text-emerald-600" />
+        {/* ── KPI CARDS ── */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+          <KpiCard iconKey="calendar" label="Total Events"     value={events.length}        sub={`${events.filter(e => e.status === "Upcoming").length} upcoming`} />
+          <KpiCard iconKey="bookmark" label="Active Bookings"  value={activeBookings}        sub="confirmed"      />
+          <KpiCard iconKey="chat"     label="Pending Feedback" value={pendingFeedback}        sub="needs response" />
+          <KpiCard iconKey="bell"     label="Announcements"    value={announcements.length}  sub="total"          />
         </div>
 
-        <div className="mt-12 grid grid-cols-1 gap-10 lg:grid-cols-2">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+          {/* ── QUICK ACTIONS ── */}
           <section>
-            <h2 className="text-2xl font-semibold text-slate-900">Quick Actions</h2>
-
-            <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
-              <QuickActionCard to="/admin/events" icon={IconCalendar} label="Create Event" />
-              <QuickActionCard to="/announcements" icon={IconBell} label="Post Announcement" />
-              <QuickActionCard to="/admin" icon={IconDownload} label="Export XML" />
-              <QuickActionCard to="/admin" icon={IconUpload} label="Import XML" />
+            <h2 className="text-xl font-bold text-slate-900 mb-4">Quick Actions</h2>
+            <div className="grid grid-cols-2 gap-3">
+              <QuickCard iconKey="plus"     label="Create Event"       onClick={() => navigate("/admin/events")}        />
+              <QuickCard iconKey="bell"     label="Post Announcement"  onClick={() => navigate("/admin/announcements")} />
+              <QuickCard iconKey="download" label="Export XML"         onClick={handleExport}                           />
+              <QuickCard iconKey="upload"   label="Import XML"         onClick={handleImportClick}                      />
             </div>
           </section>
 
+          {/* ── MANAGEMENT ── */}
           <section>
-            <h2 className="text-2xl font-semibold text-slate-900">Management</h2>
-
-            <div className="mt-6 space-y-3">
-              <ManagementRow to="/admin/events" icon={IconCalendar} label="Manage Events" rightText={`${events.length} events`} />
-              <ManagementRow to="/admin/users" icon={IconUsers} label="Manage Users" rightText={`${users.length} users`} />
-              <ManagementRow to="/admin/feedback" icon={IconChat} label="Manage Feedback" rightText={`${feedback.length} submissions`} />
-              <ManagementRow to="/announcements" icon={IconBell} label="Manage Announcements" rightText={`${announcements.length} announcements`} />
+            <h2 className="text-xl font-bold text-slate-900 mb-4">Management</h2>
+            <div className="space-y-2">
+              <MgmtRow to="/admin/events"        iconKey="calendar" label="Manage Events"        count={events.length}        unit="events"        />
+              <MgmtRow to="/admin/bookings"      iconKey="bookmark" label="Manage Bookings"      count={activeBookings}        unit="bookings"      />
+              <MgmtRow to="/admin/feedback"      iconKey="chat"     label="Manage Feedback"      count={pendingFeedback}       unit="submissions"   />
+              <MgmtRow to="/admin/announcements" iconKey="bell"     label="Manage Announcements" count={announcements.length} unit="announcements" />
+              <MgmtRow to="/admin/users"         iconKey="users"    label="Manage Users"         count={users.length}         unit="users"         />
             </div>
           </section>
+
         </div>
 
-        <section className="mt-14">
-          <h2 className="text-2xl font-semibold text-slate-900">Recent Activity</h2>
-
-          <Card className="mt-6 p-6">
-            <div className="space-y-6">
-              {recentActivity.map((a, idx) => (
-                <div
-                  key={idx}
-                  className="flex items-start gap-4 border-b border-slate-100 pb-6 last:border-b-0 last:pb-0"
-                >
-                  <div className="mt-2 h-2 w-2 rounded-full bg-blue-800" />
-                  <div className="flex-1">
-                    <div className="text-slate-800">{a.message}</div>
-                    <div className="mt-1 text-sm text-slate-500">{a.time}</div>
-                  </div>
+        {/* ── RECENT ACTIVITY ── */}
+        <section className="mt-8">
+          <h2 className="text-xl font-bold text-slate-900 mb-4">Recent Activity</h2>
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm divide-y divide-slate-100">
+            {recentActivity.map((a, i) => (
+              <div key={i} className="flex items-start gap-4 px-5 py-4">
+                <span className={`mt-1.5 h-2.5 w-2.5 rounded-full flex-shrink-0 ${a.dot}`} />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-slate-800">{a.msg}</p>
+                  <p className="text-xs text-slate-400 mt-0.5">{a.time}</p>
                 </div>
-              ))}
-            </div>
-          </Card>
+              </div>
+            ))}
+          </div>
         </section>
+
+        <div className="mt-8 text-center">
+          <Link to="/" className="text-sm text-slate-400 hover:text-blue-600 hover:underline transition">
+            ← Back to public site
+          </Link>
+        </div>
       </div>
     </div>
   );
