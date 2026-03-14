@@ -54,6 +54,35 @@ export default function Profile() {
   });
 
   // Not logged in
+  // Admin/staff redirect to their dashboard — they don't have a public profile
+  if (user && (user.role === "admin" || user.role === "staff")) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
+        <div className="text-center max-w-sm bg-white rounded-2xl border border-slate-200 shadow-sm p-8">
+          <div className="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center mx-auto mb-4">
+            <Icon path="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0z" className="w-7 h-7 text-blue-700" />
+          </div>
+          <h2 className="text-lg font-bold text-slate-900 mb-1">
+            Welcome, {user.name?.split(" ")[0]}
+          </h2>
+          <p className="text-sm text-slate-500 mb-1">{user.email}</p>
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200 mb-6">
+            {user.role === "admin" ? "Administrator" : "Staff Member"}
+          </span>
+          <div className="space-y-2">
+            <Link to="/admin" className="block w-full px-4 py-2.5 bg-blue-700 text-white text-sm font-semibold rounded-xl hover:bg-blue-800 transition text-center">
+              Go to Admin Portal
+            </Link>
+            <button onClick={() => { logout(); navigate("/login"); }}
+              className="block w-full px-4 py-2.5 border border-slate-200 text-slate-600 text-sm font-semibold rounded-xl hover:bg-slate-50 transition">
+              Sign Out
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (!user) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">

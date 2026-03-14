@@ -141,6 +141,7 @@ export default function AdminDashboard() {
   const { user, logout } = useAuth();
   const navigate         = useNavigate();
   const fileRef          = useRef();
+  const isAdmin          = user?.role === "admin";
 
   const [toast, setToast] = useState(null);
 
@@ -281,8 +282,8 @@ export default function AdminDashboard() {
             <div className="grid grid-cols-2 gap-3">
               <QuickCard iconKey="plus"     label="Create Event"       onClick={() => navigate("/admin/events")}        />
               <QuickCard iconKey="bell"     label="Post Announcement"  onClick={() => navigate("/admin/announcements")} />
-              <QuickCard iconKey="download" label="Export XML"         onClick={handleExport}                           />
-              <QuickCard iconKey="upload"   label="Import XML"         onClick={handleImportClick}                      />
+              {isAdmin && <QuickCard iconKey="download" label="Export XML" onClick={handleExport} />}
+              {isAdmin && <QuickCard iconKey="upload"   label="Import XML"   onClick={handleImportClick} />}
             </div>
           </section>
 
@@ -294,7 +295,7 @@ export default function AdminDashboard() {
               <MgmtRow to="/admin/bookings"      iconKey="bookmark" label="Manage Bookings"      count={activeBookings}        unit="bookings"      />
               <MgmtRow to="/admin/feedback"      iconKey="chat"     label="Manage Feedback"      count={pendingFeedback}       unit="submissions"   />
               <MgmtRow to="/admin/announcements" iconKey="bell"     label="Manage Announcements" count={announcements.length} unit="announcements" />
-              <MgmtRow to="/admin/users"         iconKey="users"    label="Manage Users"         count={users.length}         unit="users"         />
+              {isAdmin && <MgmtRow to="/admin/users" iconKey="users" label="Manage Users" count={users.length} unit="users" />}
             </div>
           </section>
 

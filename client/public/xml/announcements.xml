@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<announcements>
+  <announcement>
+    <id>1</id>
+    <title>Bin Night Schedule Changes — Summer 2026</title>
+    <summary>Waste collection times will change over the holiday period. Please check your updated schedule to avoid missed collections.</summary>
+    <content>Due to the upcoming public holidays, waste collection services will be operating on adjusted schedules from 20 December 2025 through to 10 January 2026. Residents are advised to put bins out the evening before their usual collection day. For full details including your suburb schedule, visit the Waste Collection page or contact our customer service team.</content>
+    <category>Services</category>
+    <priority>High</priority>
+    <date>2026-03-01</date>
+    <author>CityLink Services Team</author>
+  </announcement>
+  <announcement>
+    <id>2</id>
+    <title>Community Clean-Up Day — Register Now</title>
+    <summary>Join your neighbours for our annual Community Clean-Up Day on 22 March 2026. Volunteers needed across all suburbs.</summary>
+    <content>CityLink Initiatives is hosting its annual Community Clean-Up Day on Saturday 22 March 2026. We are calling for volunteers to help keep our parks, streets, and waterways clean. Equipment and refreshments will be provided. Register through the Events page to secure your spot. All ages welcome.</content>
+    <category>Events</category>
+    <priority>Medium</priority>
+    <date>2026-02-28</date>
+    <author>Community Engagement Team</author>
+  </announcement>
+  <announcement>
+    <id>3</id>
+    <title>New Online Permit Applications Now Available</title>
+    <summary>Residents can now submit building and planning permit applications entirely online through the CityLink portal.</summary>
+    <content>We are pleased to announce that building and planning permit applications are now fully available online. Residents no longer need to visit the council office in person. Simply log in, navigate to Services, and select Permits to begin your application. Processing times remain 10–15 business days.</content>
+    <category>Services</category>
+    <priority>Medium</priority>
+    <date>2026-02-20</date>
+    <author>Planning &amp; Development Team</author>
+  </announcement>
+  <announcement>
+    <id>4</id>
+    <title>Town Hall Meeting — Budget Consultation 2026</title>
+    <summary>CityLink invites all residents to attend the annual budget consultation session on 15 April 2026 at the Civic Centre.</summary>
+    <content>Your voice matters. CityLink Initiatives is hosting its annual community budget consultation on 15 April 2026 at 6:30pm at the Civic Centre, 123 Council Street. Residents are encouraged to attend and share their priorities for the upcoming financial year. Light refreshments will be provided. Seats are limited — register via the Events page.</content>
+    <category>Community</category>
+    <priority>High</priority>
+    <date>2026-02-15</date>
+    <author>Office of the CEO</author>
+  </announcement>
+  <announcement>
+    <id>5</id>
+    <title>Portal Maintenance — Sunday 16 March, 2am–5am</title>
+    <summary>The CityLink portal will be offline for scheduled maintenance on Sunday 16 March between 2am and 5am AEDT.</summary>
+    <content>We will be performing scheduled system maintenance on Sunday 16 March 2026 between 2:00am and 5:00am AEDT. During this window the portal, including booking and feedback services, will be temporarily unavailable. We apologise for any inconvenience and thank you for your patience.</content>
+    <category>System</category>
+    <priority>Low</priority>
+    <date>2026-03-10</date>
+    <author>CityLink IT Team</author>
+  </announcement>
+</announcements>

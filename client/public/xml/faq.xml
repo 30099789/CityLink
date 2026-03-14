@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<faqs>
+  <category name="Events &amp; Bookings">
+    <faq>
+      <question>How do I register for an event?</question>
+      <answer>To register for an event, navigate to the Events page, click on the event card, and follow the booking instructions. You must be logged in to complete a booking.</answer>
+    </faq>
+    <faq>
+      <question>Can I cancel my event booking?</question>
+      <answer>Yes. Visit your Profile page, go to the Bookings tab, and select Cancel next to the event. Cancellations must be made at least 24 hours before the event start time.</answer>
+    </faq>
+    <faq>
+      <question>When is the next community event?</question>
+      <answer>Upcoming events are listed on the Events page. The schedule is updated regularly, so check back often for new additions.</answer>
+    </faq>
+  </category>
+  <category name="Services">
+    <faq>
+      <question>How do I access community services?</question>
+      <answer>Navigate to the Services page to browse available services such as waste collection, permits, and rates enquiries. Each service has its own request or information form.</answer>
+    </faq>
+    <faq>
+      <question>How long does garbage collection take?</question>
+      <answer>Garbage collection typically occurs on a weekly basis. Schedules may vary by suburb. Check your local area details on the Waste Collection service page.</answer>
+    </faq>
+    <faq>
+      <question>How do I submit a service request?</question>
+      <answer>Go to Services, select the relevant service, and complete the online request form. You will receive a confirmation once your request has been received.</answer>
+    </faq>
+  </category>
+  <category name="Account &amp; Profile">
+    <faq>
+      <question>How do I create an account?</question>
+      <answer>Click Sign Up in the top navigation bar and fill in your name, email address, and password. Your account will be created immediately.</answer>
+    </faq>
+    <faq>
+      <question>How do I update my profile information?</question>
+      <answer>Log in and click your name in the navbar to go to your Profile page. You can edit your name, email, phone number, and address from there.</answer>
+    </faq>
+    <faq>
+      <question>I forgot my password. What do I do?</question>
+      <answer>On the Login page, click Forgot Password and enter your registered email. A reset link will be sent to your inbox within a few minutes.</answer>
+    </faq>
+  </category>
+  <category name="Feedback &amp; Contact">
+    <faq>
+      <question>How do I provide feedback?</question>
+      <answer>Visit the Feedback page, select a category, rate your experience, and write your comments. Feedback is reviewed by our team and helps improve our services.</answer>
+    </faq>
+    <faq>
+      <question>How do I report a portal issue?</question>
+      <answer>Use the Contact Us page to report technical issues. Please include as much detail as possible — screenshots are helpful — so our team can resolve the issue quickly.</answer>
+    </faq>
+    <faq>
+      <question>How long does it take to get a response?</question>
+      <answer>We aim to respond to all enquiries within 2 business days. Urgent matters can be escalated by phone during business hours.</answer>
+    </faq>
+  </category>
+</faqs>

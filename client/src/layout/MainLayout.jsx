@@ -1,20 +1,62 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { NavLink, Outlet, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { getMenuConfig } from "../services/xmlService";
 
-const NAV_LINKS = [
-  { label: "Home",          to: "/",             end: true },
-  { label: "Services",      to: "/services" },
-  { label: "Events",        to: "/events" },
-  { label: "FAQ",           to: "/faq" },
-  { label: "Announcements", to: "/announcements" },
-  { label: "Feedback",      to: "/feedback" },
-  { label: "Contact",       to: "/contact" },
+// Fallback nav in case XML fails to load
+const FALLBACK_NAV = [
+  { label: "Home",          path: "/", end: "true" },
+  { label: "Services",      path: "/services" },
+  { label: "Events",        path: "/events" },
+  { label: "FAQ",           path: "/faq" },
+  { label: "Announcements", path: "/announcements" },
+  { label: "Feedback",      path: "/feedback" },
+  { label: "Contact",       path: "/contact" },
+];
+
+const FALLBACK_FOOTER_LINKS = [
+  { label: "Services",  path: "/services"  },
+  { label: "Events",    path: "/events"    },
+  { label: "FAQ",       path: "/faq"       },
+  { label: "Feedback",  path: "/feedback"  },
+];
+
+const FALLBACK_LEGAL_LINKS = [
+  { label: "Accessibility Statement", path: "/accessibility" },
+  { label: "Privacy Policy",          path: "/privacy"       },
+  { label: "Terms of Service",        path: "/terms"         },
 ];
 
 export default function MainLayout() {
   const { user, logout } = useAuth();
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [menuOpen, setMenuOpen]       = useState(false);
+  const [navLinks, setNavLinks]       = useState(FALLBACK_NAV);
+  const [footerLinks, setFooterLinks] = useState(FALLBACK_FOOTER_LINKS);
+  const [legalLinks, setLegalLinks]   = useState(FALLBACK_LEGAL_LINKS);
+
+  // Load menu config from XML
+  useEffect(() => {
+    getMenuConfig().then((menu) => {
+      if (!menu) return; // keep fallback
+
+      // Navbar items
+      const items = menu?.navbar?.item;
+      if (items) {
+        const arr = Array.isArray(items) ? items : [items];
+        setNavLinks(arr.map((i) => ({ label: i.label, path: i.path, end: i.end })));
+      }
+
+      // Footer sections
+      const sections = menu?.footer?.section;
+      if (sections) {
+        const arr = Array.isArray(sections) ? sections : [sections];
+        const quick = arr.find((s) => s["@_name"] === "Quick Links");
+        const legal = arr.find((s) => s["@_name"] === "Legal");
+        if (quick?.item) setFooterLinks(Array.isArray(quick.item) ? quick.item : [quick.item]);
+        if (legal?.item) setLegalLinks(Array.isArray(legal.item) ? legal.item : [legal.item]);
+      }
+    });
+  }, []);
 
   const desktopLink = ({ isActive }) =>
     `px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
@@ -50,10 +92,13 @@ export default function MainLayout() {
               </div>
             </Link>
 
-            {/* Desktop nav */}
+            {/* Desktop nav — driven by menu.xml */}
             <nav className="hidden lg:flex items-center gap-0.5 flex-1 justify-center">
-              {NAV_LINKS.map(({ label, to, end }) => (
-                <NavLink key={to} to={to} end={end} className={desktopLink}>{label}</NavLink>
+              {navLinks.map(({ label, path, end }) => (
+                <NavLink key={path} to={path} end={end === "true" || end === true}
+                  className={desktopLink}>
+                  {label}
+                </NavLink>
               ))}
             </nav>
 
@@ -61,13 +106,14 @@ export default function MainLayout() {
             <div className="hidden lg:flex items-center gap-2 flex-shrink-0">
               {user ? (
                 <>
-                  <NavLink to="/profile" className="px-3 py-2 text-sm font-semibold text-blue-700 hover:text-blue-900 transition-colors">
-                    {user.name?.split(" ")[0] || "Profile"}
-                  </NavLink>
-                  {(user.role === "admin" || user.role === "staff") && (
+                  {(user.role === "admin" || user.role === "staff") ? (
                     <Link to="/admin" className="px-3 py-2 rounded-lg text-sm font-semibold text-white bg-slate-800 hover:bg-slate-700 transition-colors">
-                      Admin
+                      Admin Portal
                     </Link>
+                  ) : (
+                    <NavLink to="/profile" className="px-3 py-2 text-sm font-semibold text-blue-700 hover:text-blue-900 transition-colors">
+                      {user.name?.split(" ")[0] || "Profile"}
+                    </NavLink>
                   )}
                   <button onClick={logout} className="px-3 py-2 rounded-lg text-sm font-semibold text-slate-600 border border-slate-200 hover:bg-slate-50 transition-colors">
                     Sign Out
@@ -85,16 +131,17 @@ export default function MainLayout() {
             <div className="flex lg:hidden items-center gap-2">
               {!user ? (
                 <Link to="/login" className="px-3 py-1.5 text-sm font-semibold text-blue-700">Log In</Link>
+              ) : (user.role === "admin" || user.role === "staff") ? (
+                <Link to="/admin" onClick={close} className="px-3 py-1.5 text-sm font-semibold text-slate-700 font-bold">
+                  Admin
+                </Link>
               ) : (
                 <Link to="/profile" onClick={close} className="px-3 py-1.5 text-sm font-semibold text-blue-700">
                   {user.name?.split(" ")[0] || "Profile"}
                 </Link>
               )}
-              <button
-                onClick={() => setMenuOpen((o) => !o)}
-                aria-label="Toggle menu"
-                className="p-2 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 transition-colors"
-              >
+              <button onClick={() => setMenuOpen((o) => !o)} aria-label="Toggle menu"
+                className="p-2 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 transition-colors">
                 {menuOpen ? (
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -106,15 +153,17 @@ export default function MainLayout() {
                 )}
               </button>
             </div>
-
           </div>
         </div>
 
-        {/* ── MOBILE MENU ── */}
+        {/* Mobile menu — driven by menu.xml */}
         {menuOpen && (
           <div className="lg:hidden border-t border-slate-200 bg-white px-4 py-3 space-y-1">
-            {NAV_LINKS.map(({ label, to, end }) => (
-              <NavLink key={to} to={to} end={end} className={mobileLink} onClick={close}>{label}</NavLink>
+            {navLinks.map(({ label, path, end }) => (
+              <NavLink key={path} to={path} end={end === "true" || end === true}
+                className={mobileLink} onClick={close}>
+                {label}
+              </NavLink>
             ))}
             <div className="border-t border-slate-100 pt-3 mt-2 space-y-1">
               {user ? (
@@ -146,7 +195,7 @@ export default function MainLayout() {
         <Outlet />
       </main>
 
-      {/* ── FOOTER ── */}
+      {/* ── FOOTER — driven by menu.xml ── */}
       <footer className="bg-white border-t border-slate-200 mt-auto">
         <div className="mx-auto max-w-6xl px-4 py-10">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -167,28 +216,27 @@ export default function MainLayout() {
               </p>
             </div>
 
-            {/* Quick Links */}
+            {/* Quick Links — from XML */}
             <div>
               <p className="text-sm font-bold text-slate-900 mb-4">Quick Links</p>
               <div className="space-y-2.5">
-                {[
-                  { label: "Services",  to: "/services"  },
-                  { label: "Events",    to: "/events"    },
-                  { label: "FAQ",       to: "/faq"       },
-                  { label: "Feedback",  to: "/feedback"  },
-                ].map(({ label, to }) => (
-                  <Link key={to} to={to} className="block text-sm text-slate-500 hover:text-blue-700 transition-colors">{label}</Link>
+                {footerLinks.map(({ label, path }) => (
+                  <Link key={path} to={path} className="block text-sm text-slate-500 hover:text-blue-700 transition-colors">
+                    {label}
+                  </Link>
                 ))}
               </div>
             </div>
 
-            {/* Legal */}
+            {/* Legal — from XML */}
             <div>
               <p className="text-sm font-bold text-slate-900 mb-4">Legal</p>
               <div className="space-y-2.5">
-                <Link to="/accessibility" className="block text-sm text-slate-500 hover:text-blue-700 transition-colors">Accessibility Statement</Link>
-                <Link to="/privacy"       className="block text-sm text-slate-500 hover:text-blue-700 transition-colors">Privacy Policy</Link>
-                <Link to="/terms"         className="block text-sm text-slate-500 hover:text-blue-700 transition-colors">Terms of Service</Link>
+                {legalLinks.map(({ label, path }) => (
+                  <Link key={path} to={path} className="block text-sm text-slate-500 hover:text-blue-700 transition-colors">
+                    {label}
+                  </Link>
+                ))}
               </div>
             </div>
 
@@ -219,8 +267,6 @@ export default function MainLayout() {
 
           </div>
         </div>
-
-        {/* Bottom bar */}
         <div className="border-t border-slate-200">
           <div className="mx-auto max-w-6xl px-4 py-4 text-center">
             <p className="text-xs text-slate-400">

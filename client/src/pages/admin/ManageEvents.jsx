@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useAuth } from "../../context/AuthContext";
 import { Link } from "react-router-dom";
 import { getEvents, saveEvents } from "../../data/mockData";
 
@@ -12,6 +13,8 @@ const STATUS_COLORS = {
 const BLANK = { title: "", date: "", time: "", location: "", capacity: "", status: "Upcoming", category: "" };
 
 export default function ManageEvents() {
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
   const [events, setEvents]     = useState(getEvents);
   const [form, setForm]         = useState(BLANK);
   const [editing, setEditing]   = useState(null); // id or null

@@ -1,4 +1,5 @@
 import { createContext, useContext, useState } from "react";
+import { Link } from "react-router-dom";
 
 const AuthContext = createContext(null);
 
@@ -78,21 +79,50 @@ export function useAuth() {
   return useContext(AuthContext);
 }
 
+// ── Any admin or staff can enter ────────────────────────────────────────────
 export function RequireAdmin({ children }) {
   const { user } = useAuth();
   if (!user || (user.role !== "admin" && user.role !== "staff")) {
+    return <AccessDenied message="You must be signed in as an admin or staff member to view this page." />;
+  }
+  return children;
+}
+
+// ── Only full admins can enter ───────────────────────────────────────────────
+export function RequireAdminOnly({ children }) {
+  const { user } = useAuth();
+  if (!user || user.role !== "admin") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="text-center p-8">
-          <div className="text-5xl mb-4">🔒</div>
-          <h1 className="text-2xl font-bold text-slate-900 mb-2">Access Denied</h1>
-          <p className="text-slate-500 mb-6">You must be signed in as an admin to view this page.</p>
-          <a href="/login" className="px-5 py-2.5 bg-slate-900 text-white rounded-xl text-sm font-semibold hover:bg-slate-700 transition">
-            Go to Login
-          </a>
-        </div>
-      </div>
+      <AccessDenied
+        message="This area is restricted to administrators only."
+        sub="Staff members do not have permission to access this section."
+      />
     );
   }
   return children;
+}
+
+function AccessDenied({ message, sub }) {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
+      <div className="text-center p-8 max-w-sm">
+        <div className="w-16 h-16 rounded-2xl bg-red-50 border border-red-100 flex items-center justify-center mx-auto mb-4">
+          <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" strokeWidth={1.75} viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01M5.07 19H19a2 2 0 001.75-2.982l-6.97-12.077A2 2 0 0010.03 3.03L3.06 15.018A2 2 0 005.07 19z"/>
+          </svg>
+        </div>
+        <h1 className="text-xl font-bold text-slate-900 mb-2">Access Denied</h1>
+        <p className="text-slate-500 text-sm mb-1">{message}</p>
+        {sub && <p className="text-slate-400 text-xs mb-6">{sub}</p>}
+        <div className="flex gap-3 justify-center mt-6">
+          <Link to="/admin" className="px-4 py-2 border border-slate-200 text-slate-700 rounded-xl text-sm font-semibold hover:bg-slate-50 transition">
+            ← Dashboard
+          </Link>
+          <Link to="/login" className="px-4 py-2 bg-blue-700 text-white rounded-xl text-sm font-semibold hover:bg-blue-800 transition">
+            Switch Account
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
 }

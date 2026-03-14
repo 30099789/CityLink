@@ -57,7 +57,35 @@ function safeWrite(key, value) {
   try { localStorage.setItem(key, JSON.stringify(value)); } catch {}
 }
 
-export function initMockData() {
+export async function initMockData() {
+  // Try to load from API server first
+  try {
+    const res = await fetch("http://localhost:3001/api", {
+      signal: AbortSignal.timeout(1000),
+    });
+    if (res.ok) {
+      // Server is running — fetch real data and sync to localStorage
+      const [users, events, announcements, feedback, bookings] = await Promise.all([
+        fetch("http://localhost:3001/api/users").then(r => r.json()),
+        fetch("http://localhost:3001/api/events").then(r => r.json()),
+        fetch("http://localhost:3001/api/announcements").then(r => r.json()),
+        fetch("http://localhost:3001/api/feedback").then(r => r.json()),
+        fetch("http://localhost:3001/api/bookings").then(r => r.json()),
+      ]);
+      safeWrite("citylink_users",         users);
+      safeWrite("citylink_events",        events);
+      safeWrite("citylink_announcements", announcements);
+      safeWrite("citylink_feedback",      feedback);
+      safeWrite("citylink_bookings",      bookings);
+      localStorage.setItem("citylink_seeded", "true");
+      console.log("CityLink: data loaded from API server");
+      return;
+    }
+  } catch {
+    // Server not running — fall through to localStorage seed
+  }
+
+  // Fallback: seed localStorage with mock data if not already done
   if (!localStorage.getItem("citylink_seeded")) {
     safeWrite("citylink_users",         mockUsers);
     safeWrite("citylink_events",        mockEvents);
@@ -65,6 +93,7 @@ export function initMockData() {
     safeWrite("citylink_feedback",      mockFeedback);
     safeWrite("citylink_bookings",      mockBookings);
     localStorage.setItem("citylink_seeded", "true");
+    console.log("ℹ️ CityLink: server offline, using localStorage fallback");
   }
 }
 
