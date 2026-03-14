@@ -1,5 +1,6 @@
 import { createContext, useContext, useState } from "react";
 import { Link } from "react-router-dom";
+import api, { checkServer } from "../services/api";
 
 const AuthContext = createContext(null);
 
@@ -18,19 +19,33 @@ function getStoredUser() {
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(getStoredUser);
 
-  function login(email, password) {
-    const match = ADMIN_CREDENTIALS.find(
-      (c) => c.email === email && c.password === password
-    );
-    if (match) {
-      const u = { email: match.email, role: match.role, name: match.name };
+  async function login(email, password) {
+    // Always allow hardcoded admin/staff accounts first (no server needed)
+    const admin = ADMIN_CREDENTIALS.find(c => c.email === email && c.password === password);
+    if (admin) {
+      const u = { email: admin.email, role: admin.role, name: admin.name };
       localStorage.setItem("citylink_user", JSON.stringify(u));
       setUser(u);
-      return { success: true, role: match.role };
+      return { success: true, role: admin.role };
     }
+
+    // Try API server
+    const online = await checkServer();
+    if (online) {
+      try {
+        const data = await api.login(email, password);
+        localStorage.setItem("citylink_user", JSON.stringify(data.user));
+        setUser(data.user);
+        return { success: true, role: data.user.role };
+      } catch (err) {
+        return { success: false, error: err.message };
+      }
+    }
+
+    // Fallback: localStorage
     try {
       const users = JSON.parse(localStorage.getItem("citylink_users")) || [];
-      const found = users.find((u) => u.email === email && u.password === password);
+      const found = users.find(u => u.email === email && u.password === password);
       if (found) {
         const u = { email: found.email, role: found.role || "user", name: found.name };
         localStorage.setItem("citylink_user", JSON.stringify(u));
@@ -41,12 +56,24 @@ export function AuthProvider({ children }) {
     return { success: false, error: "Invalid email or password." };
   }
 
-  function register(name, email, password) {
+  async function register(name, email, password) {
+    const online = await checkServer();
+    if (online) {
+      try {
+        const data = await api.register(name, email, password);
+        localStorage.setItem("citylink_user", JSON.stringify(data.user));
+        setUser(data.user);
+        return { success: true };
+      } catch (err) {
+        return { success: false, error: err.message };
+      }
+    }
+
+    // Fallback: localStorage
     try {
       const users = JSON.parse(localStorage.getItem("citylink_users")) || [];
-      if (users.find((u) => u.email === email)) {
+      if (users.find(u => u.email === email))
         return { success: false, error: "An account with this email already exists." };
-      }
       const newUser = {
         id: `u${Date.now()}`, name, email, password,
         role: "user", status: "Active",
@@ -75,30 +102,21 @@ export function AuthProvider({ children }) {
   );
 }
 
-export function useAuth() {
-  return useContext(AuthContext);
-}
+export function useAuth() { return useContext(AuthContext); }
 
-// ── Any admin or staff can enter ────────────────────────────────────────────
+// Any admin or staff
 export function RequireAdmin({ children }) {
   const { user } = useAuth();
-  if (!user || (user.role !== "admin" && user.role !== "staff")) {
-    return <AccessDenied message="You must be signed in as an admin or staff member to view this page." />;
-  }
+  if (!user || (user.role !== "admin" && user.role !== "staff"))
+    return <AccessDenied message="You must be signed in as an admin or staff member." />;
   return children;
 }
 
-// ── Only full admins can enter ───────────────────────────────────────────────
+// Full admins only
 export function RequireAdminOnly({ children }) {
   const { user } = useAuth();
-  if (!user || user.role !== "admin") {
-    return (
-      <AccessDenied
-        message="This area is restricted to administrators only."
-        sub="Staff members do not have permission to access this section."
-      />
-    );
-  }
+  if (!user || user.role !== "admin")
+    return <AccessDenied message="This area is restricted to administrators only." sub="Staff members do not have permission to access this section." />;
   return children;
 }
 
@@ -115,12 +133,8 @@ function AccessDenied({ message, sub }) {
         <p className="text-slate-500 text-sm mb-1">{message}</p>
         {sub && <p className="text-slate-400 text-xs mb-6">{sub}</p>}
         <div className="flex gap-3 justify-center mt-6">
-          <Link to="/admin" className="px-4 py-2 border border-slate-200 text-slate-700 rounded-xl text-sm font-semibold hover:bg-slate-50 transition">
-            ← Dashboard
-          </Link>
-          <Link to="/login" className="px-4 py-2 bg-blue-700 text-white rounded-xl text-sm font-semibold hover:bg-blue-800 transition">
-            Switch Account
-          </Link>
+          <Link to="/admin" className="px-4 py-2 border border-slate-200 text-slate-700 rounded-xl text-sm font-semibold hover:bg-slate-50 transition">← Dashboard</Link>
+          <Link to="/login" className="px-4 py-2 bg-blue-700 text-white rounded-xl text-sm font-semibold hover:bg-blue-800 transition">Switch Account</Link>
         </div>
       </div>
     </div>

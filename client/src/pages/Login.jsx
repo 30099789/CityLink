@@ -15,7 +15,7 @@ export default function Login() {
     setError("");
     if (!email || !password) { setError("Please fill in all fields."); return; }
     setLoading(true);
-    const result = login(email, password);
+    const result = await login(email, password);
     setLoading(false);
     if (result.success) {
       navigate(result.role === "admin" || result.role === "staff" ? "/admin" : "/");

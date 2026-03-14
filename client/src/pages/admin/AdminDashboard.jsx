@@ -1,10 +1,13 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import {
-  getEvents, getBookings, getFeedback, getAnnouncements, getUsers,
-  saveEvents, saveAnnouncements, saveFeedback, saveBookings,
-} from "../../data/mockData";
+import { fetchEvents } from "../../services/eventService";
+import { fetchAnnouncements } from "../../services/announcementService";
+import { fetchFeedback } from "../../services/feedbackService";
+import { fetchBookings } from "../../services/bookingService";
+import { fetchUsers } from "../../services/userService";
+import { getEvents, getBookings, getFeedback, getAnnouncements, getUsers,
+  saveEvents, saveAnnouncements, saveFeedback, saveBookings } from "../../data/mockData";
 
 /* ── ICONS ─────────────────────────────────────────────────────────────────── */
 const I = ({ d, cls = "w-5 h-5" }) => (
@@ -145,11 +148,19 @@ export default function AdminDashboard() {
 
   const [toast, setToast] = useState(null);
 
-  const events        = getEvents();
-  const bookings      = getBookings();
-  const feedback      = getFeedback();
-  const announcements = getAnnouncements();
-  const users         = getUsers();
+  const [events,        setEvents]        = useState([]);
+  const [bookings,      setBookings]      = useState([]);
+  const [feedback,      setFeedback]      = useState([]);
+  const [announcements, setAnnouncements] = useState([]);
+  const [users,         setUsers]         = useState([]);
+
+  useEffect(() => {
+    fetchEvents().then(setEvents);
+    fetchBookings().then(setBookings);
+    fetchFeedback().then(setFeedback);
+    fetchAnnouncements().then(setAnnouncements);
+    fetchUsers().then(setUsers);
+  }, []);
 
   const activeBookings  = bookings.filter((b) => b.status === "Confirmed").length;
   const pendingFeedback = feedback.filter((f) => f.status === "New").length;

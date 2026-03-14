@@ -28,7 +28,7 @@ export default function Signup() {
       setError("You must agree to the Terms & Privacy Policy."); return;
     }
     setLoading(true);
-    const result = register(form.name, form.email, form.password);
+    const result = await register(form.name, form.email, form.password);
     setLoading(false);
     if (result.success) {
       navigate("/");
@@ -123,4 +123,4 @@ export default function Signup() {
       </div>
     </main>
   );
-}
+}``
