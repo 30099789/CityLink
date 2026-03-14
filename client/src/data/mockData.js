@@ -54,7 +54,7 @@ function safeRead(key, fallback) {
 }
 
 function safeWrite(key, value) {
-  try { localStorage.setItem(key, JSON.stringify(value)); } catch {}
+  try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* ignore */ }
 }
 
 export async function initMockData() {

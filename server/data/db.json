@@ -53,6 +53,15 @@
       "role": "user",
       "status": "Active",
       "joined": "2026-03-14"
+    },
+    {
+      "id": "u1773464077276",
+      "name": "Kate",
+      "email": "kate.test@a.com",
+      "password": "123456!!!",
+      "role": "user",
+      "status": "Active",
+      "joined": "2026-03-14"
     }
   ],
   "events": [
@@ -252,9 +261,9 @@
     },
     {
       "id": "fb-1773462109877",
-      "status": "New",
+      "status": "Resolved",
       "submittedDate": "2026-03-14",
-      "response": "",
+      "response": "Thanks",
       "userName": "Test User",
       "userEmail": "test@email.com",
       "category": "General",
